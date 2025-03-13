@@ -1,0 +1,78 @@
+import yfinance as yf
+
+# Portfolio dictionary to store stocks and shares
+portfolio = {}
+
+def add_stock(symbol, shares):
+    """Add a stock to the portfolio."""
+    symbol = symbol.upper()
+    portfolio[symbol] = portfolio.get(symbol, 0) + shares
+    print(f"✅ Added {shares} shares of {symbol}.")
+
+def remove_stock(symbol, shares):
+    """Remove stocks from the portfolio."""
+    symbol = symbol.upper()
+    if symbol in portfolio:
+        if portfolio[symbol] > shares:
+            portfolio[symbol] -= shares
+            print(f"✅ Removed {shares} shares of {symbol}.")
+        else:
+            del portfolio[symbol]
+            print(f"✅ Removed all shares of {symbol}.")
+    else:
+        print("⚠️ Stock not found in portfolio.")
+
+def fetch_stock_prices():
+    """Fetch real-time stock prices."""
+    if not portfolio:
+        print("⚠️ No stocks in your portfolio.")
+        return
+    
+    print("\n📊 Stock Prices:")
+    for symbol in portfolio:
+        try:
+            stock = yf.Ticker(symbol)
+            price = stock.history(period="1d")["Close"].iloc[-1]
+            print(f"{symbol}: ${price:.2f} ({portfolio[symbol]} shares)")
+        except Exception as e:
+            print(f"⚠️ Could not fetch price for {symbol}: {e}")
+
+def main():
+    """Main menu for stock tracker."""
+    while True:
+        print("\n📈 Stock Portfolio Manager")
+        print("1️⃣ Add Stock")
+        print("2️⃣ Remove Stock")
+        print("3️⃣ View Stock Prices")
+        print("4️⃣ Exit")
+        
+        choice = input("Choose an option: ")
+        
+        if choice == "1":
+            symbol = input("Enter stock symbol (e.g., AAPL, TSLA): ").upper()
+            try:
+                shares = int(input("Enter number of shares: "))
+                add_stock(symbol, shares)
+            except ValueError:
+                print("⚠️ Invalid input. Please enter a number.")
+        
+        elif choice == "2":
+            symbol = input("Enter stock symbol to remove: ").upper()
+            try:
+                shares = int(input("Enter number of shares to remove: "))
+                remove_stock(symbol, shares)
+            except ValueError:
+                print("⚠️ Invalid input. Please enter a number.")
+        
+        elif choice == "3":
+            fetch_stock_prices()
+        
+        elif choice == "4":
+            print("👋 Exiting Stock Tracker.")
+            break
+        
+        else:
+            print("⚠️ Invalid choice. Try again.")
+
+if __name__ == "__main__":
+    main()
